@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import PlaywrightWrapper from "../wrapper/PlaywrightWrappers";
-import testdata from '../hooks/testdata.json';
+//import testdata from '../hooks/testdata.json';
 
 export default class LoginPage {
     private base: PlaywrightWrapper;

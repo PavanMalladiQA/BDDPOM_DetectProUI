@@ -14,7 +14,8 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": ["node", "@playwright/test"]
+    "types": ["node", "@playwright/test"],
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "tests/**/*",
