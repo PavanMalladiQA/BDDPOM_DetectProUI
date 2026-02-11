@@ -1,28 +1,21 @@
-import {Given, When, Then, setDefaultTimeout} from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
-import { fixture } from "../hooks/pageFixture";
-import testdata from '../hooks/testdata.json';
-//import loginPage from '../pages/loginPage';
+import { createBdd } from 'playwright-bdd';
+import { pageFixture } from "../hooks/pageFixture";
 
-setDefaultTimeout(60 * 1000 * 2);
+const { Given, When, Then } = createBdd();
 
-Given('the user navigates to URL', async function () {
-    await fixture.page.goto(process.env.BASEURL || 'https://detectpro.sub360test.co.uk/en');    
-         });
+Given('the user navigates to URL', async ({page}) => {
+     await page.goto('./'); // resolves under baseURL (includes /en)    
+});
          
-When('the user enters a valid username {string} and password {string}', async function (username, password) {
-    await this.base.loginPage.enterUserName(username);
-    await this.base.loginPage.enterPassword(password);
-       
-         });
+When('the user enters a valid username {string} and password {string}', async ({}, username: string, password: string) => {
+    await pageFixture.loginPage.enterUserName(username);
+    await pageFixture.loginPage.enterPassword(password);
+});
 
-When('clicks the login button', async function () {
-    await this.base.loginPage.clickLoginButton();  
-         });
+When('clicks the login button', async () => {
+    await pageFixture.loginPage.clickLoginButton();  
+});
 
-Then('the user should be successfully navigated to Landing Page', async function () {
-    await this.base.loginPage.checkBannericon();
-    //const homeLogo = fixture.page.locator("(//button[contains(@class,'z-0 group')])[3]");
-    //await expect(homeLogo).toBeDisabled();      
-         });
-
+Then('the user should be successfully navigated to Landing Page', async () => {
+    await pageFixture.landingPage.assertBannerIconVisible();
+});

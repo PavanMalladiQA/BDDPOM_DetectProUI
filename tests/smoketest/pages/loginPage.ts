@@ -1,26 +1,24 @@
-import { expect, Page } from "@playwright/test";
-import PlaywrightWrapper from "../wrapper/PlaywrightWrappers";
-//import testdata from '../hooks/testdata.json';
+import { Page } from "@playwright/test";
 
 export default class LoginPage {
-    private base: PlaywrightWrapper;
-    constructor(private page: Page) {
-        this.base = new PlaywrightWrapper(page);
-    }
+    
+    constructor(private page: Page) {}
 
     private Elements = {
         usernameInput: "input[name='username']",
         passwordInput: "input[name='password']",
         loginButton: "button[type='submit']",
-        landingbannerLogo: "(//a[@role='link'])[1]"
-    }
+        landingbannerLogo: "(//a[@role='link'])[1]",
+    };
 
     async navigateToLoginPage() {
-        await this.base.goto("/");
+        await this.page.goto("./"); // baseURL already includes /en
     }
 
     async enterUserName(username: string) {
-        await this.page.locator(this.Elements.usernameInput).fill(username);
+        const user = await this.page.locator(this.Elements.usernameInput);
+        await user.waitFor({ state: 'visible', timeout: 15_000 });
+        await user.fill(username);
     }
 
     async enterPassword(password: string) {
@@ -32,12 +30,10 @@ export default class LoginPage {
     }
 
     async loginUser(username: string, password: string) {
+        await this.navigateToLoginPage();
         await this.enterUserName(username);
         await this.enterPassword(password);
         await this.clickLoginButton();
     }
 
-    async checkBannericon() {
-        await expect(this.page.locator(this.Elements.landingbannerLogo)).toBeVisible();
-    }
 }
