@@ -122,9 +122,10 @@ export default class LandingPage {
         await box.fill(desiredCustomer); 
         
         // wait for matching option to appear, then choose it
-        const option = this.page.locator(`//li[.//span[normalize-space()="${desiredCustomer}"]]`);
+        const option = this.page.getByRole('option', { name: desiredCustomer });
         await expect(option).toBeVisible({ timeout: 15_000 });
         await option.click();
+        await expect(box).toHaveValue(desiredCustomer, { timeout: 15_000 });
     }
 
     async verifySelectedCustomerInDropdown(expectedCustomer: string) {
