@@ -1,6 +1,5 @@
 {
     "cucumberautocomplete.steps": [
-        "tests/smoketest/steps/**.ts"
-        
+        "tests/smoketest/steps/**/*.ts"
     ]
 }

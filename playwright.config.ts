@@ -53,6 +53,13 @@ export default defineConfig({
       },
     },
 
+    // Login feature: must NOT use storageState
+    {
+      name: 'login',
+      testMatch: /[\\/]features[\\/]login\.feature\.spec\.(js|ts)$/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+
     // Landing tests: need login state only
     {
       name: 'landing',
@@ -75,11 +82,28 @@ export default defineConfig({
       },
     },
 
-    // Login feature: must NOT use storageState
+    // ✅ Substation Overview Explore View tests: need login + customer selected
     {
-      name: 'login',
-      testMatch: /[\\/]features[\\/]login\.feature\.spec\.(js|ts)$/,
-      use: { ...devices['Desktop Chrome'] },
+      name: 'explore-substation-overview',
+      dependencies: ['setup-customer'],
+      testMatch: /[\\/]features[\\/]exploreview_SubstationOverview\.feature\.spec\.(js|ts)$/,
+      timeout: 120_000,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/customer.json',
+      },
+    },
+
+    // Electrical Explore View tests: need login + customer selected
+    {
+      name: 'explore-electrical',
+      dependencies: ['setup-customer'],
+      testMatch: /[\\/]features[\\/]exploreview_Electrical\.feature\.spec\.(js|ts)$/,
+      timeout: 120_000,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/customer.json',
+      },
     },
   ],
 });

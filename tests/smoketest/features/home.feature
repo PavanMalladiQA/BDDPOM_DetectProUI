@@ -9,7 +9,7 @@ Feature: Smoke Test - Detect Pro Home Screen
 
   Scenario: Home screen loads with key UI elements
     Then the Instrument counts should be displayed in the banner
-    And the left navigation menu should be visible
+    And the Home Page left navigation menu should be visible
     And the left navigation menu should contain:
       | item               |
       | Home               |

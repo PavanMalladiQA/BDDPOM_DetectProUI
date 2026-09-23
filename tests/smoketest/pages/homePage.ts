@@ -47,6 +47,7 @@ export default class HomePage {
     circuitConditionLeftNavPanel: "(//div[contains(@class,'p-5 mr-2')])[2]",
 
     // Instrument Tile components (existing)
+    exploreButtonGrid:"(//div[contains(@class,'p-3 h-auto')]//button)[2]",
     substationTypeInInstrumentTile: "(//span[@class='block text-visnet-grey-100'])[1]",
     instrumentsInInstrumentTile: "(//span[@class='block text-visnet-grey-100'])[2]",
     alarmsInInstrumentTile: "(//span[@class='block text-visnet-grey-100'])[3]",
@@ -415,16 +416,12 @@ export default class HomePage {
     }
   }
 
-  async assertQuickViewPanelVisible() {
-    await expect(this.page.locator('div.space-y-3.p-5')).toBeVisible({ timeout: 10_000 });
-    await expect(this.page.locator(this.Elements.quickViewPanelSubstationDetailsHeader)).toBeVisible();
-    await expect(this.page.locator(this.Elements.quickViewPanelInstrumentsHeader)).toBeVisible();
-    await expect(this.page.locator(this.Elements.quickViewPanelCableConditionHeader)).toBeVisible();
-  }
+  async clickExploreOnFirstCard() {
+    await this.switchToGridView();
 
-  async clickExploreInQuickView() {
-    const btn = this.page.locator(this.Elements.quickviewExploreButton);
+    const btn = this.exploreButtonGrid();
     await expect(btn).toBeVisible({ timeout: 15_000 });
+
     // Click with best-practice fallback if overlay intercepts
     try {
       await btn.click();
@@ -432,7 +429,47 @@ export default class HomePage {
       await btn.click({ force: true });
     }
   }
-  
+
+  async assertQuickViewPanelVisible() {
+    await expect(this.page.locator('div.space-y-3.p-5')).toBeVisible({ timeout: 10_000 });
+    await expect(this.page.locator(this.Elements.quickViewPanelSubstationDetailsHeader)).toBeVisible();
+    await expect(this.page.locator(this.Elements.quickViewPanelInstrumentsHeader)).toBeVisible();
+    await expect(this.page.locator(this.Elements.quickViewPanelCableConditionHeader)).toBeVisible();
+  }
+
+
+private async waitForOverlayToClear(timeoutMs = 10_000) {
+  const overlay = this.overlayBlocker();
+  if (await overlay.count()) {
+    await overlay.waitFor({ state: 'hidden', timeout: timeoutMs }).catch(() => {});
+    // also handle "detached" case
+    if (await overlay.count()) {
+      await overlay.waitFor({ state: 'detached', timeout: 2_000 }).catch(() => {});
+    }
+  }
+}
+
+  async clickExploreInQuickView() {
+    const quickViewPanel = this.page.locator('div.space-y-3.p-5').filter({ has: this.page.getByRole('button', { name: /^explore$/i }) }).last();
+    const btn = quickViewPanel.getByRole('button', { name: /^explore$/i }).first();
+
+    await expect(quickViewPanel).toBeVisible({ timeout: 15_000 });
+    await expect(btn).toBeVisible({ timeout: 15_000 });
+    await this.waitForOverlayToClear(10_000);
+
+    try {
+      await Promise.all([
+        this.page.waitForURL(/substation|details/i, { timeout: 20_000 }).catch(() => {}),
+        btn.click({ timeout: 15_000 }),
+      ]);
+    } catch {
+      await Promise.all([
+        this.page.waitForURL(/substation|details/i, { timeout: 20_000 }).catch(() => {}),
+        btn.click({ force: true, timeout: 15_000 }),
+      ]);
+    }
+  }
+
   async assertNavigatedToSubstationDetails() {
     await expect(this.page).toHaveURL(/substation|details/i, { timeout: 15_000 });
   }

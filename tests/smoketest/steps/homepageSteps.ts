@@ -12,7 +12,7 @@ Then('the Instrument counts should be displayed in the banner', async () => {
   await pageFixture.homePage.assertInstrumentCountsVisible();
 });
 
-Then('the left navigation menu should be visible', async () => {
+Then('the Home Page left navigation menu should be visible', async () => {
   await pageFixture.homePage.assertLeftNavVisible();
 });
 
@@ -178,8 +178,13 @@ Then('the Quick view panel should be displayed', async () => {
 });
 
 When('the user clicks on the {string} button in quick view', async ({}, arg: string) => {
-  if (arg === 'Explore') return pageFixture.homePage.clickExploreInQuickView();
-  throw new Error(`No handler for substation card click: ${arg}`);
+  if (arg !== 'Explore') throw new Error(`No handler for substation card click: ${arg}`);
+
+  // Click Explore (which navigates / updates route)
+  await pageFixture.homePage.clickExploreInQuickView();
+
+  // Now wait until Explore Overview is actually loaded
+  await pageFixture.exploreView_SubstationOverviewPage.assertSubstationOverviewLoaded();
 });
 
 Then('the user should be navigated to the Substation details page', async () => {
