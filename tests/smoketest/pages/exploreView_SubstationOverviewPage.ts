@@ -1,6 +1,7 @@
 import { expect, Page, Locator } from '@playwright/test';
 
 export default class ExploreView_SubstationOverviewPage {
+  // Stores the browser page used by this page object.
   constructor(private page: Page) {}
 
   // ---------------- Locators ----------------
@@ -35,7 +36,6 @@ export default class ExploreView_SubstationOverviewPage {
     substationNotesandImagesDataSlot_SubstationImages: "//h2[normalize-space(text())='Substation Images']",
     substationNotesandImagesDataSlot_SubstationNotes: "//h2[normalize-space(text())='Substation Notes']",
 
-    transformerDataSlot: "(//div[contains(@class,'px-4 bg-content1')]//button)[3]",
     transformerDataSlot_TransformerDetailsSection: "//h2[normalize-space(text())='Transformer Details']",
     transformerDataSlot_L1Phase: "//div[normalize-space(text())='L1']",
     transformerDataSlot_L2Phase: "//div[normalize-space(text())='L2']",
@@ -44,10 +44,12 @@ export default class ExploreView_SubstationOverviewPage {
   };
 
   // ---------------- Convenience Locators ----------------
+    // Returns the Substation Overview left-navigation container.
     private leftNav(): Locator {
     return this.page.locator(this.Elements.substationOverviewLeftNavigationMenu);
     }
 
+    // Maps a left-navigation label to its button locator.
     private navButtonFor(item: string): Locator {
     // Scope ALL nav buttons to the left navigation container
     const nav = this.leftNav();
@@ -67,8 +69,7 @@ export default class ExploreView_SubstationOverviewPage {
     if (idx === undefined) throw new Error(`No nav mapping for item: "${item}"`);
     return buttons.nth(idx);
     }
-
-
+  // Clicks a visible, enabled control and retries with force if needed.
   private async safeClick(locator: Locator) {
     await expect(locator).toBeVisible({ timeout: 30_000 });
     await expect(locator).toBeEnabled({ timeout: 30_000 });
@@ -79,6 +80,7 @@ export default class ExploreView_SubstationOverviewPage {
     }
   }
 
+  // Verifies a section is hidden or removed from the DOM.
   private async assertHiddenOrDetached(locator: Locator) {
     // Handles either "hidden" OR "not in DOM"
     try {
@@ -88,19 +90,26 @@ export default class ExploreView_SubstationOverviewPage {
     }
   }
 
+  // Expands a section and verifies its content becomes visible.
   private async toggleSection(button: Locator, oneVisibleHeader: Locator) {
     await expect(button).toBeVisible({ timeout: 15_000 });
-    await button.click();
+    const expanded = await button.getAttribute('aria-expanded');
+    if (expanded !== 'true') await button.click();
+    if (expanded !== null) await expect(button).toHaveAttribute('aria-expanded', 'true');
     await expect(oneVisibleHeader).toBeVisible({ timeout: 15_000 });
   }
 
+  // Collapses a section and verifies its content is hidden or removed.
   private async collapseSection(button: Locator, oneHeaderToDisappear: Locator) {
     await expect(button).toBeVisible({ timeout: 15_000 });
-    await button.click();
+    const expanded = await button.getAttribute('aria-expanded');
+    if (expanded !== 'false') await button.click();
+    if (expanded !== null) await expect(button).toHaveAttribute('aria-expanded', 'false');
     await this.assertHiddenOrDetached(oneHeaderToDisappear);
   }
 
   // ---------------- Assertions: Page Loaded ----------------
+  // Verifies the overview page shell has finished loading.
   async assertSubstationOverviewLoaded() {
     const nav = this.leftNav();
     const mainNavButton = nav.locator('button[type="button"]').first();
@@ -118,6 +127,7 @@ export default class ExploreView_SubstationOverviewPage {
 
 
   // ---------------- Left Navigation ----------------
+  // Verifies the overview left-navigation menu is visible.
   async assertLeftNavVisible() {
     await expect(this.leftNav()).toBeVisible({ timeout: 15_000 });
   }
@@ -127,6 +137,7 @@ export default class ExploreView_SubstationOverviewPage {
    * - "visible, clickable"
    * - "Disabled, not clickable"
    */
+  // Verifies a left-navigation item matches its requested state.
   async assertLeftNavItemState(item: string, states: string) {
     const btn = this.navButtonFor(item);
     await expect(btn).toBeVisible({ timeout: 15_000 });
@@ -150,26 +161,31 @@ export default class ExploreView_SubstationOverviewPage {
     }
   }
 
+  // Clicks a left-navigation item by its label.
   async clickLeftNavItem(item: string) {
     const btn = this.navButtonFor(item);
     await this.safeClick(btn);
   }
 
   // ---------------- Chart Filters / Fault Filters ----------------
+    // Opens the Chart Filters panel from left navigation.
     async openChartFilters() {
     await this.safeClick(this.navButtonFor('Chart Filters'));
   }
 
+  // Verifies the Fault Filters panel is visible.
   async assertFaultFiltersPanelVisible() {
     await expect(this.page.locator(this.Elements.faultFiltersHeader)).toBeVisible({ timeout: 15_000 });
   }
 
+  // Verifies the instrument filter when the selected substation exposes it.
   async assertInstrumentDropdownVisibleIfPresent() {
     const dd = this.page.locator(this.Elements.instrumentDropDown);
     if ((await dd.count()) === 0) return; // selected substation has 1 instrument -> dropdown may not exist
     await expect(dd).toBeVisible({ timeout: 15_000 });
   }
 
+  // Verifies the optional instrument filter is enabled when present.
   async assertInstrumentDropdownClickableIfPresent() {
     const dd = this.page.locator(this.Elements.instrumentDropDown);
     if ((await dd.count()) === 0) return;
@@ -177,6 +193,7 @@ export default class ExploreView_SubstationOverviewPage {
     await expect(dd).toBeEnabled({ timeout: 15_000 });
   }
 
+  // Opens the Time Period filter and reports whether it was available.
   async openTimePeriodDropdown() {
     const loading = this.page.getByText('Loading Data');
     if (await loading.count()) {
@@ -198,6 +215,7 @@ export default class ExploreView_SubstationOverviewPage {
     return true;
   }
 
+  // Verifies a requested option exists in the Time Period list.
   async assertAllTimePeriodOptions(option: string) {
     const opened = await this.openTimePeriodDropdown();
     if (!opened) return;
@@ -213,10 +231,12 @@ export default class ExploreView_SubstationOverviewPage {
 
 
   // ---------------- Substation Details data slot ----------------
+  // Verifies the Substation data slot is visible.
   async assertSubstationDataSlotVisible() {
     await expect(this.page.locator(this.Elements.substationDataSlot)).toBeVisible({ timeout: 15_000 });
   }
 
+  // Expands the Substation data slot.
   async expandSubstationDataSlot() {
     await this.toggleSection(
       this.page.locator(this.Elements.substationDataSlot),
@@ -224,6 +244,7 @@ export default class ExploreView_SubstationOverviewPage {
     );
   }
 
+  // Verifies the requested Substation section headers are visible.
   async assertSubstationSectionHeaders(headers: string[]) {
     const map: Record<string, Locator> = {
       'Substation Details': this.page.locator(this.Elements.substationDataSlot_SubstationDetailsHeader),
@@ -239,6 +260,7 @@ export default class ExploreView_SubstationOverviewPage {
     }
   }
 
+  // Collapses the Substation data slot.
   async collapseSubstationDataSlot() {
     await this.collapseSection(
       this.page.locator(this.Elements.substationDataSlot),
@@ -247,6 +269,7 @@ export default class ExploreView_SubstationOverviewPage {
   }
 
   // ---------------- Notes & Images data slot ----------------
+  // Expands the Substation Notes and Images data slot.
   async expandNotesAndImagesDataSlot() {
     await this.toggleSection(
       this.page.locator(this.Elements.substationNotesandImagesDataSlot),
@@ -254,6 +277,7 @@ export default class ExploreView_SubstationOverviewPage {
     );
   }
 
+  // Verifies the requested Notes and Images section headers are visible.
   async assertNotesAndImagesSectionHeaders(headers: string[]) {
     const map: Record<string, Locator> = {
       'Substation Images': this.page.locator(this.Elements.substationNotesandImagesDataSlot_SubstationImages),
@@ -267,6 +291,7 @@ export default class ExploreView_SubstationOverviewPage {
     }
   }
 
+  // Collapses the Substation Notes and Images data slot.
   async collapseNotesAndImagesDataSlot() {
     await this.collapseSection(
       this.page.locator(this.Elements.substationNotesandImagesDataSlot),
@@ -275,13 +300,20 @@ export default class ExploreView_SubstationOverviewPage {
   }
 
   // ---------------- Transformer data slot ----------------
+  // Finds the first Transformer accordion button.
+  private transformerDataSlotButton(): Locator {
+    return this.page.getByRole('button', { name: /^Transformer \d+$/ }).first();
+  }
+
+  // Expands the first Transformer data slot.
   async expandTransformerDataSlot() {
     await this.toggleSection(
-      this.page.locator(this.Elements.transformerDataSlot),
+      this.transformerDataSlotButton(),
       this.page.locator(this.Elements.transformerDataSlot_TransformerDetailsSection)
     );
   }
 
+  // Verifies the requested Transformer detail sections are visible.
   async assertTransformerSections(sections: string[]) {
     const map: Record<string, Locator> = {
       'Transformer Details': this.page.locator(this.Elements.transformerDataSlot_TransformerDetailsSection),
@@ -298,10 +330,30 @@ export default class ExploreView_SubstationOverviewPage {
     }
   }
 
+  // Verifies selecting another Transformer collapses the expanded slot.
   async collapseTransformerDataSlot() {
-    await this.collapseSection(
-      this.page.locator(this.Elements.transformerDataSlot),
-      this.page.locator(this.Elements.transformerDataSlot_TransformerDetailsSection)
-    );
+    const transformerButtons = this.page.getByRole('button', { name: /^Transformer \d+$/ });
+    const transformerCount = await transformerButtons.count();
+    if (transformerCount < 2) {
+      throw new Error('At least two transformers are required to verify accordion collapse behavior.');
+    }
+
+    let expandedIndex = -1;
+    for (let index = 0; index < transformerCount; index++) {
+      if (await transformerButtons.nth(index).getAttribute('aria-expanded') === 'true') {
+        expandedIndex = index;
+        break;
+      }
+    }
+    if (expandedIndex < 0) throw new Error('No expanded Transformer accordion was found.');
+
+    const expandedTransformer = transformerButtons.nth(expandedIndex);
+    const expandedName = (await expandedTransformer.innerText()).trim();
+    const nextTransformer = transformerButtons.nth((expandedIndex + 1) % transformerCount);
+
+    await nextTransformer.click();
+    await expect(expandedTransformer).toHaveAttribute('aria-expanded', 'false');
+    await expect(this.page.getByRole('region', { name: expandedName, exact: true })).toBeHidden();
+    await expect(nextTransformer).toHaveAttribute('aria-expanded', 'true');
   }
 }

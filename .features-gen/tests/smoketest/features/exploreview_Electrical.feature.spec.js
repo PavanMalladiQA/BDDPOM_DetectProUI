@@ -1,4 +1,4 @@
-// Generated from: tests\smoketest\features\exploreview_Electrical.feature
+// Generated from: tests\smoketest\features\exploreView_Electrical.feature
 import { test } from "playwright-bdd";
 
 test.describe('Smoke Test - Detect Pro Explore View Electrical Tab', () => {
@@ -107,8 +107,8 @@ test.describe('Smoke Test - Detect Pro Explore View Electrical Tab', () => {
     await And('the chart should not display a broken component error'); 
   });
 
-  test('User can return to the Substation Overview tab', { tag: ['@electrical', '@navigation'] }, async ({ When, Then, And }) => { 
-    await When('the user selects the "Substation Overview" tab'); 
+  test('User can return to the Substation Overview tab', { tag: ['@electrical', '@navigation'] }, async ({ When, Then, And, page }) => { 
+    await When('the user selects the "Substation Overview" tab', null, { page }); 
     await Then('the Substation Overview tab should be selected'); 
     await And('the Substation Overview screen should load successfully'); 
   });
@@ -186,7 +186,7 @@ test.afterEach('AfterEach Hooks', ({ $runScenarioHooks }) => $runScenarioHooks('
 
 test.use({
   $test: [({}, use) => use(test), { scope: 'test', box: true }],
-  $uri: [({}, use) => use('tests\\smoketest\\features\\exploreview_Electrical.feature'), { scope: 'test', box: true }],
+  $uri: [({}, use) => use('tests\\smoketest\\features\\exploreView_Electrical.feature'), { scope: 'test', box: true }],
   $bddFileData: [({}, use) => use(bddFileData), { scope: "test", box: true }],
 });
 

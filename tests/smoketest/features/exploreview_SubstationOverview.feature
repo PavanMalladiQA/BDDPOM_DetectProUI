@@ -7,20 +7,22 @@ Feature: Smoke Test - Detect Pro Substation Explore Views
   Background:
   Given the user is on Detect Pro Substation Overview screen for substation under test 
 
+  @smoke @substation @navigation
   Scenario Outline: Substation Overview Screen Left Navigation
-  Then the Substation Overview left navigation menu should be visible
-  And the Substation Overview left navigation menu should contain "<item>" with associated "<states>"
+    Then the Substation Overview left navigation menu should be visible
+    And the Substation Overview left navigation menu should contain "<item>" with associated "<states>"
 
-Examples:
-  | item              | states                  |
-  | Home              | visible, clickable      |
-  | Chart Filters     | visible, clickable      |
-  | App Suite         | Disabled, not clickable |
-  | Circuit Condition | Disabled, not clickable |
-  | Substation Search | visible, clickable      |
-  | Settings          | visible, clickable      |
-  | Logout            | visible, clickable      |
+  Examples:
+    | item              | states                  |
+    | Home              | visible, clickable      |
+    | Chart Filters     | visible, clickable      |
+    | App Suite         | Disabled, not clickable |
+    | Circuit Condition | Disabled, not clickable |
+    | Substation Search | visible, clickable      |
+    | Settings          | visible, clickable      |
+    | Logout            | visible, clickable      |
 
+  @smoke @substation @fault-filters
   Scenario Outline: Scenario Outline name: Substation Overview screen Fault Filters component
     Then the Substation Overview screen should load successfully
     When the Chart Filters icon selected
@@ -29,16 +31,17 @@ Examples:
     And the Instrument Dropdown should be clickable
     And the Fault Filters should contain Time Period filter with "<options>"
 
-    Examples:
-      | options       |
-      | Last 24 hours |
-      | Last 7 days   |
-      | Last 30 days  |
-      | Last 90 days  |
-      | Single Day    |
-      | Date Range    |
+  Examples:
+    | options       |
+    | Last 24 hours |
+    | Last 7 days   |
+    | Last 30 days  |
+    | Last 90 days  |
+    | Single Day    |
+    | Date Range    |
 
-    Scenario: Substation Overview screen Substation Details
+  @smoke @substation @data-slots
+  Scenario: Substation Overview screen Substation Details
     Then the data slot for Substation should be visible
     When user expands the Substation data slot
     Then the following section headers should be displayed:
@@ -62,6 +65,5 @@ Examples:
       | L2 Phase                |
       | L3 Phase                |
       | N Phase                 |  
-    And user should be able to collapse the Transformer data slot
+    And the expanded Transformer data slot should collapse when another Transformer is selected
 
-    

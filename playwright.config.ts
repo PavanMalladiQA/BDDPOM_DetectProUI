@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import { defineConfig, devices } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
+import testdata from './tests/smoketest/hooks/testdata.json';
 
 const testDir = defineBddConfig({
   features: ['tests/smoketest/features/**/*.feature'],
@@ -26,7 +28,7 @@ export default defineConfig({
   reporter: 'html',
 
   use: {
-    baseURL: process.env.BASEURL ?? 'https://detectpro.sub360test.co.uk/en',
+    baseURL: testdata.base_url,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'on-first-retry',
@@ -50,6 +52,18 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/state.json',
+      },
+    },
+
+    // 3) Open the test substation once and save its overview URL
+    {
+      name: 'setup-overview',
+      testDir: 'tests/setup',
+      testMatch: /overview\.setup\.ts/,
+      dependencies: ['setup-customer'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/customer.json',
       },
     },
 
@@ -86,7 +100,7 @@ export default defineConfig({
     {
       name: 'explore-substation-overview',
       dependencies: ['setup-customer'],
-      testMatch: /[\\/]features[\\/]exploreview_SubstationOverview\.feature\.spec\.(js|ts)$/,
+      testMatch: /[\\/]features[\\/]exploreView_SubstationOverview\.feature\.spec\.(js|ts)$/,
       timeout: 120_000,
       use: {
         ...devices['Desktop Chrome'],
@@ -98,7 +112,28 @@ export default defineConfig({
     {
       name: 'explore-electrical',
       dependencies: ['setup-customer'],
-      testMatch: /[\\/]features[\\/]exploreview_Electrical\.feature\.spec\.(js|ts)$/,
+      testMatch: /[\\/]features[\\/]exploreView_Electrical\.feature\.spec\.(js|ts)$/,
+      timeout: 120_000,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/customer.json',
+      },
+    },
+
+    {
+      name: 'exploreview-tabs',
+      dependencies: ['setup-overview'],
+      testMatch: /[\\/]features[\\/]exploreView_Tabs\.feature\.spec\.(js|ts)$/,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/customer.json',
+      },
+    },
+
+    {
+      name: 'exploreview-instruments',
+      dependencies: ['setup-overview'],
+      testMatch: /[\\/]features[\\/]exploreView_Instruments\.feature\.spec\.(js|ts)$/,
       timeout: 120_000,
       use: {
         ...devices['Desktop Chrome'],

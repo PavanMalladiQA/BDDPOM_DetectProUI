@@ -85,7 +85,7 @@ Feature: Smoke Test - Detect Pro Home Screen
 
   Scenario: Quick view and Explore actions
     When I switch to Grid view
-    When the user clicks on the "Quick view" button on a substation card
+    When the user clicks on the "Quick view" button on the substation under test
     Then the Quick view panel should be displayed
     When the user clicks on the "Explore" button in quick view
     Then the user should be navigated to the Substation details page

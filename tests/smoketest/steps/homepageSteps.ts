@@ -1,5 +1,6 @@
 import { createBdd } from 'playwright-bdd';
 import { pageFixture } from '../hooks/pageFixture';
+import testdata from '../hooks/testdata.json';
 
 const { Given, When, Then } = createBdd();
 
@@ -167,9 +168,9 @@ Then('the Circuit Condition panel should be visible', async () => {
 
 // -------- Quick view & Explore actions --------
 
-When('the user clicks on the {string} button on a substation card', async ({}, arg: string) => {
+When('the user clicks on the {string} button on the substation under test', async ({}, arg: string) => {
   // These methods should ensure Grid view / cards are ready (recommended in HomePage)
-  if (arg === 'Quick view') return pageFixture.homePage.clickQuickViewOnFirstCard();
+  if (arg === 'Quick view') return pageFixture.homePage.clickQuickViewOnSubstation(testdata.substation_name);
   throw new Error(`No handler for substation card click: ${arg}`);
 });
 

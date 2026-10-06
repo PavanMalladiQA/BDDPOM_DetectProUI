@@ -1,7 +1,8 @@
 // tests/setup/customer.setup.ts
 import { test as setup, expect } from '@playwright/test';
+import testdata from '../smoketest/hooks/testdata.json';
 
-const CUSTOMER_NAME = process.env.DP_CUSTOMER ?? 'EA Technology Manufacturer';
+const CUSTOMER_NAME = testdata.customer_name;
 
 setup('select customer', async ({ page }) => {
   await page.goto('./', { waitUntil: 'domcontentloaded' });

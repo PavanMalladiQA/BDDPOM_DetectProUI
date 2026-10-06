@@ -1,6 +1,7 @@
 import { createBdd } from 'playwright-bdd';
 import { pageFixture } from '../hooks/pageFixture';
 import { DataTable } from '@cucumber/cucumber';
+import { readFile } from 'node:fs/promises';
 
 const { Given, When, Then } = createBdd();
 
@@ -8,13 +9,12 @@ const { Given, When, Then } = createBdd();
 
 Given(
   'the user is on Detect Pro Substation Overview screen for substation under test',
-  async ({}) => {
-    await pageFixture.homePage.gotoHome();
-    await pageFixture.homePage.assertOnHomeSubCounters();
+  async ({ page }) => {
+    const overviewState = JSON.parse(
+      await readFile('playwright/.auth/overview-url.json', 'utf8')
+    ) as { url: string };
 
-    await pageFixture.homePage.switchToGridView();
-    await pageFixture.homePage.clickExploreOnFirstCard();
-    
+    await page.goto(overviewState.url, { waitUntil: 'domcontentloaded' });
     await pageFixture.exploreView_SubstationOverviewPage.assertSubstationOverviewLoaded();
   }
 );
@@ -113,6 +113,6 @@ Then('the following sections should be displayed:', async ({}, dataTable: DataTa
   await pageFixture.exploreView_SubstationOverviewPage.assertTransformerSections(sections);
 });
 
-Then('user should be able to collapse the Transformer data slot', async ({}) => {
+Then('the expanded Transformer data slot should collapse when another Transformer is selected', async ({}) => {
   await pageFixture.exploreView_SubstationOverviewPage.collapseTransformerDataSlot();
 });

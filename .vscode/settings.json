@@ -1,5 +1,6 @@
 {
-    "cucumberautocomplete.steps": [
-        "tests/smoketest/steps/**/*.ts"
-    ]
+  "cucumberautocomplete.steps": [
+    "tests/smoketest/steps/**/*.ts"
+  ],
+  "cucumberautocomplete.syncfeatures": "tests/smoketest/features/**/*.feature"
 }

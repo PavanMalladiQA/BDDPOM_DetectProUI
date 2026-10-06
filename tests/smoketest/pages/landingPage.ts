@@ -2,6 +2,7 @@ import { expect, type Page } from "@playwright/test";
 //import testdata from '../hooks/testdata.json';
 
 export default class LandingPage {
+    // Stores the browser page used by this page object.
         constructor(private page: Page) {
     }
 
@@ -22,34 +23,42 @@ export default class LandingPage {
 
     };
 
+    // Verifies the landing-page banner logo is visible.
     async assertBannerIconVisible() {
         await expect(this.page.locator(this.Elements.landingbannerLogo)).toBeVisible({ timeout: 15_000 });
     }
 
+    // Verifies the customer dropdown button is visible in the banner.
     async checkBannerCustomerDropdownButton() {
         await expect(this.page.locator(this.Elements.customerBannerDropdownButton)).toBeVisible();
     }
 
+    // Verifies the banner customer dropdown can be clicked.
     async checkBannerCustomerDropdownBoxClickable() {
         await this.page.locator(this.Elements.customerBannerDropdownBox).click({ trial: true });
     }
 
+    // Verifies the banner customer button is actionable.
     async checkBannerCustomerDropdownButtonClickable() {
         await this.page.locator(this.Elements.customerBannerDropdownButton).click({ trial: true });
     }
 
+    // Opens the banner customer dropdown.
     async clickCustomerDropdown() {
         await this.page.locator(this.Elements.customerBannerDropdownButton).click();
     }
 
+    // Verifies the customer dropdown is visible in the page body.
     async checkCustomerDropdowninMidScreen() {
         await expect(this.page.locator(this.Elements.customerDropdown)).toBeVisible();
     }
 
+    // Verifies the no-customer-selected message is visible.
     async checkNoCustomerSelectedMessage() {
         await expect(this.page.locator(this.Elements.nocustomerselectedMessage)).toBeVisible();
     }   
 
+    // Verifies the Commissioning footer link is visible and actionable.
     async checkCommissioningFooterLinkVisibleAndClickable() {
     const link = this.page.locator(this.Elements.commissioningFooterLink);
 
@@ -58,10 +67,12 @@ export default class LandingPage {
     await link.click({ trial: true }); // validates actionability without triggering navigation
     }
 
+    // Opens the Commissioning footer link.
     async clickCommissioningFooterLink() {
         await this.page.locator(this.Elements.commissioningFooterLink).click();
     }
 
+    // Verifies the Commissioning link opens its site in a new page.
     async checkCommissioningSiteNavigation() {
         
         // Listen for the new page (tab or window) that opens after the click
@@ -84,23 +95,28 @@ export default class LandingPage {
 
     }
 
+    // Verifies the Feedback footer link is visible and actionable.
     async checkFeedbackFooterLinkVisibleAndClickable() {
         const link = this.page.locator(this.Elements.feedbackFooterLink);
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
         await link.click({ trial: true }); // validates actionability without triggering navigation
     }
+    // Opens the Feedback footer link.
     async clickFeedbackFooterLink() {
         await this.page.locator(this.Elements.feedbackFooterLink).click();
     }
+    // Verifies the Submit Feedback popup is visible.
     async checkSubmitFeedbackPopupDisplayed() {
         await expect(this.page.locator(this.Elements.submitFeedbackPopup)).toBeVisible();
     }
 
+    // Closes the Submit Feedback popup.
     async closeSubmitFeedbackPopup() {
         await this.page.locator(this.Elements.submitFeedbackPopupCloseButton).click();
     }
 
+    // Verifies the Contact Support footer link is visible and actionable.
     async checkContactSupportFooterLinkVisibleAndClickable() {
         const link = this.page.locator(this.Elements.contactsupportFooterLink);
         await expect(link).toBeVisible();
@@ -108,14 +124,17 @@ export default class LandingPage {
         await link.click({ trial: true }); // validates actionability without triggering navigation
     }
 
+    // Opens the Contact Support footer link.
     async clickContactSupportFooterLink() {
         await this.page.locator(this.Elements.contactsupportFooterLink).click();
     }
 
+    // Verifies the Contact Support popup is visible.
     async checkContactSupportPopupDisplayed() {
         await expect(this.page.locator(this.Elements.contactsupportGotQuestionPopup)).toBeVisible();
     }
 
+    // Selects a customer from the banner dropdown by name.
     async selectDesiredCustomerFromDropdown(desiredCustomer: string) {
         const box = this.page.locator(this.Elements.customerBannerDropdownBox);
         await box.click();
@@ -128,17 +147,20 @@ export default class LandingPage {
         await expect(box).toHaveValue(desiredCustomer, { timeout: 15_000 });
     }
 
+    // Verifies the banner dropdown contains the expected customer.
     async verifySelectedCustomerInDropdown(expectedCustomer: string) {
         const selectedCustomer = await this.page.locator(this.Elements.customerBannerDropdownBox).inputValue();
         expect(selectedCustomer).toBe(expectedCustomer);
     }
 
+    // Verifies the Home page loaded with the expected customer selected.
     async checkHomePageLoadedForCustomer(expectedCustomer: string) {
         await expect(this.page.locator(this.Elements.homescreenHomeIcon)).toBeDisabled(); // The home icon is disabled on the home page
         const selectedCustomer = await this.page.locator(this.Elements.customerBannerDropdownBox).inputValue();
         expect(selectedCustomer).toBe(expectedCustomer);
     }
 
+    // Verifies a requested customer appears in the dropdown options.
     async checkCustomerExistsInDropdown(customerName: string) {
      
         await this.page.locator(this.Elements.customerBannerDropdownBox).click();
